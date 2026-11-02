@@ -13,22 +13,53 @@ router.post('/register', async (req, res) => {
 
         const demoOwnerId = '00000000-0000-0000-0000-000000000000';
 
-        // Ensure a dummy/demo profile exists to satisfy foreign key constraints
+        // 1. Ensure a demo profile exists to prevent foreign key errors
         await supabase
             .from('profiles')
             .upsert([{ id: demoOwnerId, full_name: 'Campus Vendor', role: 'seller' }]);
 
-        const { data, error } = await supabase
+        // 2. Check if a business already exists for this owner
+        const { data: existingBiz } = await supabase
             .from('businesses')
-            .upsert([{
-                owner_id: demoOwnerId,
-                business_name,
-                description,
-                category,
-                location_description
-            }], { onConflict: 'owner_id' })
-            .select()
-            .single();
+            .select('*')
+            .eq('owner_id', demoOwnerId)
+            .maybeSingle();
+
+        let data, error;
+
+        if (existingBiz) {
+            // Update existing storefront
+            const updateResult = await supabase
+                .from('businesses')
+                .update({
+                    business_name,
+                    description,
+                    category,
+                    location_description
+                })
+                .eq('id', existingBiz.id)
+                .select()
+                .single();
+            
+            data = updateResult.data;
+            error = updateResult.error;
+        } else {
+            // Create brand new storefront
+            const insertResult = await supabase
+                .from('businesses')
+                .insert([{
+                    owner_id: demoOwnerId,
+                    business_name,
+                    description,
+                    category,
+                    location_description
+                }])
+                .select()
+                .single();
+            
+            data = insertResult.data;
+            error = insertResult.error;
+        }
 
         if (error) throw error;
 
