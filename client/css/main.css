@@ -1,3 +1,29 @@
+/* Fix visibility for all form inputs and selects in dashboards */
+.card-box input, 
+.card-box select, 
+.card-box textarea {
+    background: #0f172a !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    color: #ffffff !important;
+    padding: 0.8rem !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    font-size: 0.9rem !important;
+}
+
+.card-box input::placeholder, 
+.card-box textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+.card-box input:focus, 
+.card-box select:focus, 
+.card-box textarea:focus {
+    border-color: #10b981 !important;
+    outline: none !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2) !important;
+}
+
 :root {
     --bg-dark: #0a0e17;
     --card-bg: rgba(18, 24, 38, 0.7);
