@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUCONNECT — Campus Marketplace</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Glow Effect -->
+    <div class="bg-glow"></div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand">MU<span>CONNECT</span></a>
+            <div class="nav-actions">
+                <button id="aiToggleBtn" class="btn-ai">🤖 Chat with AI</button>
+                <a href="dashboard-seller.html" class="btn-secondary">Seller Hub</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero / Welcome Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <span class="badge">AHAK DEV × TEKARU</span>
+            <h1>Campus Commerce, <br><span class="highlight">Reimagined.</span></h1>
+            <p>Discover food, tech, fashion, and services directly from student entrepreneurs around campus.</p>
+            
+            <!-- Live Search Bar -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search for food, gadgets, dorm essentials...">
+                <button id="searchBtn" class="btn-primary">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marketplace Categories -->
+    <section class="categories-section">
+        <div class="container">
+            <h2 class="section-title">Explore Categories</h2>
+            <div class="category-grid">
+                <button class="cat-card active" data-cat="all">🔥 All</button>
+                <button class="cat-card" data-cat="Food & Drinks">🍔 Food & Drinks</button>
+                <button class="cat-card" data-cat="Electronics">⚡ Electronics</button>
+                <button class="cat-card" data-cat="Fashion">👗 Fashion</button>
+                <button class="cat-card" data-cat="Services">🛠️ Services</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Grid -->
+    <section class="products-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Campus Listings</h2>
+                <span id="productCount" class="count-badge">Loading...</span>
+            </div>
+            <div id="productGrid" class="product-grid">
+                <!-- Products dynamically rendered here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Assistant Floating Widget -->
+    <div id="aiWidget" class="ai-widget hidden">
+        <div class="ai-header">
+            <div class="ai-avatar">🤖</div>
+            <div class="ai-title">
+                <h3>Muconnect AI</h3>
+                <small>AHAK DEV's Assistant</small>
+            </div>
+            <button id="aiCloseBtn" class="close-btn">&times;</button>
+        </div>
+        <div id="aiChatBox" class="ai-chat-box">
+            <div class="ai-msg bot">
+                Welcome to Muconnect! 👋 What are you looking for today on campus?
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" id="aiInput" placeholder="Ask AI (e.g. 'Food under K50')...">
+            <button id="aiSendBtn" class="btn-send">Send</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+</body>
+</html>
