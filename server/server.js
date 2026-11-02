@@ -27,12 +27,19 @@ app.get('/api/v1', (req, res) => {
     res.json({ message: 'Welcome to the Muconnect API Core 🚀' });
 });
 
-// Add this inside server/server.js
+// =========================================
+// API ROUTES
+// =========================================
 const productRoutes = require('./routes/product.routes');
-app.use('/api/v1/products', productRoutes);
+const orderRoutes = require('./routes/order.routes');
 
-// Global Error Handler
-app.err((err, req, res, next) => {
+app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/orders', orderRoutes);
+
+// =========================================
+// GLOBAL ERROR HANDLER
+// =========================================
+app.use((err, req, res, next) => {
     console.error('Server Error:', err.stack);
     res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
