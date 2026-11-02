@@ -27,6 +27,9 @@ app.get('/api/v1', (req, res) => {
     res.json({ message: 'Welcome to the Muconnect API Core 🚀' });
 });
 
+const aiRoutes = require('./routes/ai.routes');
+app.use('/api/v1/ai', aiRoutes);
+
 // =========================================
 // API ROUTES
 // =========================================
