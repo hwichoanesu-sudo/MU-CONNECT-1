@@ -30,6 +30,16 @@ app.get('/api/v1', (req, res) => {
 const aiRoutes = require('./routes/ai.routes');
 app.use('/api/v1/ai', aiRoutes);
 
+const path = require('path');
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../client')));
+
+// Catch-all route to serve index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
 // =========================================
 // API ROUTES
 // =========================================
