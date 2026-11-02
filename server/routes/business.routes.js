@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
+const crypto = require('crypto');
 
 // POST: Create or update business profile
 router.post('/register', async (req, res) => {
@@ -11,14 +12,21 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Business name and category are required.' });
         }
 
-        const demoOwnerId = '00000000-0000-0000-0000-000000000000';
+        // Use a consistent demo owner ID or generate one
+        const demoOwnerId = '11111111-1111-1111-1111-111111111111';
 
-        // 1. Ensure a demo profile exists to prevent foreign key errors
-        await supabase
+        // 1. Force insert/upsert the profile using service role (bypasses RLS)
+        const { error: profileError } = await supabase
             .from('profiles')
-            .upsert([{ id: demoOwnerId, full_name: 'Campus Vendor', role: 'seller' }]);
+            .upsert([
+                { id: demoOwnerId, full_name: 'Campus Vendor', role: 'seller', phone_number: '260900000000' }
+            ], { onConflict: 'id' });
 
-        // 2. Check if a business already exists for this owner
+        if (profileError) {
+            console.error('Profile Upsert Warning:', profileError.message);
+        }
+
+        // 2. Check if business exists for this owner
         const { data: existingBiz } = await supabase
             .from('businesses')
             .select('*')
@@ -28,37 +36,37 @@ router.post('/register', async (req, res) => {
         let data, error;
 
         if (existingBiz) {
-            // Update existing storefront
-            const updateResult = await supabase
+            // Update existing business
+            const updateRes = await supabase
                 .from('businesses')
                 .update({
                     business_name,
-                    description,
+                    description: description || '',
                     category,
-                    location_description
+                    location_description: location_description || 'Campus'
                 })
                 .eq('id', existingBiz.id)
                 .select()
                 .single();
             
-            data = updateResult.data;
-            error = updateResult.error;
+            data = updateRes.data;
+            error = updateRes.error;
         } else {
-            // Create brand new storefront
-            const insertResult = await supabase
+            // Insert new business
+            const insertRes = await supabase
                 .from('businesses')
                 .insert([{
                     owner_id: demoOwnerId,
                     business_name,
-                    description,
+                    description: description || '',
                     category,
-                    location_description
+                    location_description: location_description || 'Campus'
                 }])
                 .select()
                 .single();
             
-            data = insertResult.data;
-            error = insertResult.error;
+            data = insertRes.data;
+            error = insertRes.error;
         }
 
         if (error) throw error;
