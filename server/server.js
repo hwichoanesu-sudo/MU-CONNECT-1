@@ -27,6 +27,10 @@ app.get('/api/v1', (req, res) => {
     res.json({ message: 'Welcome to the Muconnect API Core 🚀' });
 });
 
+// Add this inside server/server.js
+const productRoutes = require('./routes/product.routes');
+app.use('/api/v1/products', productRoutes);
+
 // Global Error Handler
 app.err((err, req, res, next) => {
     console.error('Server Error:', err.stack);
