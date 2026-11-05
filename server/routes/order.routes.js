@@ -2,16 +2,18 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
-// POST: Process checkout and generate WhatsApp redirect link
+// Set your platform admin WhatsApp number here to receive order copies
+const ADMIN_WHATSAPP = '260970000000'; // Replace with your actual admin number
+
 router.post('/checkout', async (req, res) => {
     try {
-        const { productId, buyerName, buyerLocation, buyerPhone, quantity } = req.body;
+        const { productId, buyerName, buyerWhatsapp, quantity } = req.body;
 
         if (!productId) {
             return res.status(400).json({ success: false, error: 'Product ID is required.' });
         }
 
-        // 1. Fetch product details along with business info
+        // 1. Fetch product and associated business info
         const { data: product } = await supabase
             .from('products')
             .select('*, businesses(*)')
@@ -19,10 +21,11 @@ router.post('/checkout', async (req, res) => {
             .maybeSingle();
 
         const productName = product ? product.name : 'Campus Item';
-        const productPrice = product ? product.price : '200';
-        let vendorPhone = '260970000000'; // Default fallback phone number
+        const productPrice = product ? product.price : 0;
+        const businessName = product && product.businesses ? product.businesses.business_name : 'Muconnect Vendor';
+        let vendorPhone = '260970000000';
 
-        // 2. Fetch seller phone number if business & owner exist
+        // 2. Fetch vendor's registered phone number
         if (product && product.businesses && product.businesses.owner_id) {
             const { data: profile } = await supabase
                 .from('profiles')
@@ -35,32 +38,41 @@ router.post('/checkout', async (req, res) => {
             }
         }
 
-        // 3. Optional order log entry
+        const qty = parseInt(quantity) || 1;
+        const totalPrice = productPrice * qty;
+
+        // 3. Format the order message matching Poultry Prime style
+        const message = `🛍️ *New Order from Muconnect!*\n\n` +
+                        `🏢 *Business:* ${businessName}\n` +
+                        `📦 *Item:* ${productName}\n` +
+                        `🔢 *Quantity:* ${qty}\n` +
+                        `💰 *Total Price:* K${totalPrice}\n\n` +
+                        `👤 *Customer Name:* ${buyerName || 'Student'}\n` +
+                        `📞 *Customer WhatsApp:* ${buyerWhatsapp || 'N/A'}`;
+
+        // 4. Generate WhatsApp URL pointing to the vendor
+        const whatsappUrl = `https://wa.me/${vendorPhone}?text=${encodeURIComponent(message)}`;
+
+        // Optional: Log order in Supabase database
         try {
             await supabase.from('orders').insert([{
                 product_id: productId,
-                buyer_location: buyerLocation || 'Campus Hostel',
-                total_price: (product ? product.price : 200) * (quantity || 1),
+                buyer_location: buyerWhatsapp,
+                total_price: totalPrice,
                 status: 'pending'
             }]);
         } catch (dbErr) {
-            console.log('Non-fatal order log notice:', dbErr.message);
+            console.log('Order log note:', dbErr.message);
         }
 
-        // 4. Construct WhatsApp Payload
-        const message = `🛍️ *New Muconnect Order!*\n\n` +
-                        `📦 *Item:* ${productName} (K${productPrice})\n` +
-                        `👤 *Name:* ${buyerName || 'Student'}\n` +
-                        `📍 *Location/Room:* ${buyerLocation || 'Hostel'}\n` +
-                        `📞 *Number:* ${buyerPhone || 'N/A'}`;
-
-        const whatsappUrl = `https://wa.me/${vendorPhone}?text=${encodeURIComponent(message)}`;
-
-        res.json({ success: true, whatsappUrl });
+        res.json({ 
+            success: true, 
+            whatsappUrl,
+            adminNoticeUrl: `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent('📋 *Admin Copy:*\n' + message)}`
+        });
     } catch (err) {
         console.error('Checkout error:', err.message);
-        const fallbackUrl = `https://wa.me/260970000000?text=${encodeURIComponent('Hello, I want to place an order on Muconnect!')}`;
-        res.json({ success: true, whatsappUrl: fallbackUrl });
+        res.status(500).json({ success: false, error: 'Server error processing checkout.' });
     }
 });
 
