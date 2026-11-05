@@ -9,6 +9,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Custom Checkout Modal -->
+<div id="checkout-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: #1e293b; padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid rgba(16, 185, 129, 0.3);">
+        <h3 style="color: #fff; margin-bottom: 1.5rem; font-size: 1.2rem;">Complete Your Order</h3>
+        
+        <div style="margin-bottom: 1rem;">
+            <label style="color: #94a3b8; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Your Name</label>
+            <input type="text" id="buyer-name" placeholder="e.g. David Mwewa" style="width: 100%; padding: 0.7rem; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label style="color: #94a3b8; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Room or Location of Delivery</label>
+            <input type="text" id="buyer-location" placeholder="e.g. Mulungushi Hostel Room 12A" style="width: 100%; padding: 0.7rem; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label style="color: #94a3b8; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Phone Number</label>
+            <input type="text" id="buyer-phone" placeholder="e.g. 0971234567" style="width: 100%; padding: 0.7rem; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button id="submit-order-btn" style="flex: 1; background: #10b981; color: white; border: none; padding: 0.8rem; border-radius: 6px; font-weight: bold; cursor: pointer;">WhatsApp Button</button>
+            <button id="close-modal-btn" style="background: #334155; color: white; border: none; padding: 0.8rem 1rem; border-radius: 6px; cursor: pointer;">Cancel</button>
+        </div>
+    </div>
+</div>
     <!-- Background Glow Effect -->
     <div class="bg-glow"></div>
 
