@@ -2,14 +2,46 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabase');
 
-// POST: Process checkout and generate WhatsApp redirect link
 router.post('/checkout', async (req, res) => {
     try {
-        const { productId, buyerLocation, quantity } = req.body;
+        const { productId, buyerName, buyerLocation, buyerPhone, quantity } = req.body;
 
-        if (!productId) {
-            return res.status(400).json({ success: false, error: 'Product ID is required.' });
+        const { data: product } = await supabase
+            .from('products')
+            .select('*, businesses(*)')
+            .eq('id', productId)
+            .maybeSingle();
+
+        const productName = product ? product.name : 'Campus Item';
+        const productPrice = product ? product.price : '200';
+        let vendorPhone = '260970000000';
+
+        if (product && product.businesses && product.businesses.owner_id) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('phone_number')
+                .eq('id', product.businesses.owner_id)
+                .maybeSingle();
+            
+            if (profile && profile.phone_number) {
+                vendorPhone = profile.phone_number;
+            }
         }
+
+        // Formatted message matching your requested layout
+        const message = `🛍️ *New Muconnect Order!*\n\n` +
+                        `📦 *Item:* ${productName} (K${productPrice})\n` +
+                        `👤 *Name:* ${buyerName}\n` +
+                        `📍 *Location/Room:* ${buyerLocation}\n` +
+                        `📞 *Number:* ${buyerPhone}`;
+
+        const whatsappUrl = `https://wa.me/${vendorPhone}?text=${encodeURIComponent(message)}`;
+
+        res.json({ success: true, whatsappUrl });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Server error processing checkout.' });
+    }
+});
 
         // 1. Fetch product details along with business info
         const { data: product, error: prodError } = await supabase
